@@ -35,58 +35,6 @@ describe("UnitTest original code", function () {
 
     return { token, deployer, otherAccount };
   }
-  //   it("Should set the correct name", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     expect(await token.name()).to.equal(name);
-  //   });
-  //   it("Should set the correct symbol", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     expect(await token.symbol()).to.equal(symbol);
-  //   });
-  //   it("Should set the correct decimals", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     expect(await token.decimals()).to.equal(decimals);
-  //   });
-  //   it("Should set the correct supply", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     expect(await token.totalSupply() / 10 ** 18).to.equal(supply);
-  //   });
-  //   it("Owner set correctly", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     expect(await token.owner()).to.equal(DEPLOYER_WALLET);
-  //   });
-  //   it("Total supply minted to owner's wallet", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     expect(await token.balanceOf(DEPLOYER_WALLET) / 10 ** 18).to.equal(supply);
-  //   });
-  //   it("Initial Fee should be set correctly", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     const fees = await token.getFees();
-  //     expect(fees[0]).to.equal(feeEnabled);
-  //     expect(fees[1]).to.equal(buybackFee);
-  //     expect(fees[2]).to.equal(reflectionFee);
-  //     expect(fees[3]).to.equal(marketingFee);
-  //     expect(fees[4]).to.equal(rndFee);
-  //     expect(fees[5]).to.equal(liquidityFee);
-  //     expect(fees[6]).to.equal(feeDenominator);
-  //   });
-  //   it("Initial Fee receivers should be set correctly", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     expect(await token.autoLiquidityReceiver()).to.equal(DEPLOYER_WALLET);
-  //     expect(await token.marketingFeeReceiver()).to.equal(initial_marketingFeeReceiver);
-  //     expect(await token.rndFeeReceiver()).to.equal(initial_rndFeeReceiver);
-  //   });
-  //   it("Initial autobuyBack settings should be set correctly", async function () {
-  //     const { token } = await loadFixture(deployToken);
-  //     const fees = await token.getAutoBuybackSettings();
-  //     expect(fees[0]).to.equal(false);
-  //     expect(fees[1]).to.equal(0);
-  //     expect(fees[2]).to.equal(0);
-  //     expect(fees[3]).to.equal(0);
-  //     expect(fees[4]).to.equal(0);
-  //     expect(fees[5]).to.equal(0);
-  //   });
-  // });
 
   describe("ERC20 Functions", function () {
     it("name()", async function () {
