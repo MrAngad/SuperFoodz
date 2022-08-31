@@ -1,4 +1,4 @@
 # SuperFoodz
 
 ## ERC20 Token
-* Contract is called Token.sol
+* Contract is called SFToken.sol
