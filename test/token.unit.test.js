@@ -35,8 +35,6 @@ describe("UnitTest original code", function () {
 
     return { token, deployer, otherAccount };
   }
-
-  // describe("On Deployment", function () {
   //   it("Should set the correct name", async function () {
   //     const { token } = await loadFixture(deployToken);
   //     expect(await token.name()).to.equal(name);
