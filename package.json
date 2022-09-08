@@ -12,6 +12,7 @@
     "test": "npm run compile && TRACK_GAS=true hardhat test",
     "coverage": "npm run compile && hardhat coverage --temp temp-artifacts --testfiles test/token.unit.test.js ",
     "hardhat": "hardhat",
-    "compile": "hardhat clean && hardhat compile"
+    "compile": "hardhat clean && hardhat compile",
+    "size": "npm run compile && node size.js"
   }
 }
