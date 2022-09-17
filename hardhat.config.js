@@ -39,9 +39,9 @@ module.exports = {
   },
   networks: {
     hardhat: {
-      forking: {
-        url: process.env.MAINNET_RPC_URL
-      }
+      // forking: {
+      //   url: process.env.MAINNET_RPC_URL
+      // }
     },
     Mumbai: {
       url: process.env.MUMBAI_RPC_URL,

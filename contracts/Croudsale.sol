@@ -16,7 +16,6 @@ contract Croudsale is Ownable, OwnerWithdrawable {
 
   address public immutable saleTokenAddress;  // Address of SF Token
   uint256 public immutable saleTokenDecimals; // Decimals in SF Token
-  address public ownerWallet;                 // Address of owner's wallet
 
   uint256 public preSaleStartTime;   // Time when PreSale starts
   uint256 public preSaleEndTime;     // Time when PreSale ends
@@ -31,9 +30,8 @@ contract Croudsale is Ownable, OwnerWithdrawable {
   mapping(address => bool) public tokenWL;         // Whitelist of tokens to buy from
   mapping(address => uint256) public tokenPrices;  // 1 Token price in terms of WL tokens
   
-
   // Modifier to check if the sale has already started
-  modifier saleStarted(){
+  modifier saleNotStarted(){
     if(preSaleStartTime != 0){
         require(block.timestamp < preSaleStartTime || block.timestamp > preSaleEndTime, "PreSale: Sale has already started!");
     }
@@ -93,18 +91,21 @@ contract Croudsale is Ownable, OwnerWithdrawable {
     // Update Stats
     totalTokensSold = totalTokensSold.add(saleTokenAmt);
     buyersAmount[msg.sender] = buyersAmount[msg.sender].add(saleTokenAmt);
+    // bytes memory data = abi.encodeWithSignature("transfer(address,uint256)", msg.sender, saleTokenAmt);
+    // (bool success, bytes memory returnData) = address(saleTokenAddress).call(data);
+    // require(success, string(returnData));
   }
 
   // Function to set information of Token sold in Pre-Sale and its rate in Native currency
-  function setSaleTokenParams(uint256 _totalTokensforSale, uint256 _rate) external onlyOwner saleStarted {
+  function setSaleTokenParams(uint256 _totalTokensforSale, uint256 _rate) external onlyOwner saleNotStarted {
     require(_rate != 0, "PreSale: Invalid Native Currency rate!");
     rate = _rate;
     totalTokensforSale = _totalTokensforSale;
     IERC20Metadata(saleTokenAddress).safeTransferFrom(msg.sender, address(this), totalTokensforSale);
   }
 
-  // Function to set Pre-Sale duration and locking periods
-  function setSalePeriodParams(uint256 _preSaleStartTime, uint256 _preSaleEndTime) external onlyOwner saleStarted {
+  // Function to set Pre-Sale duration
+  function setSalePeriodParams(uint256 _preSaleStartTime, uint256 _preSaleEndTime) external onlyOwner saleNotStarted {
     require(block.timestamp < _preSaleStartTime, "PreSale: Invalid PreSale Date!");
     require(_preSaleStartTime < _preSaleEndTime, "PreSale: Invalid PreSale Dates!");
 
@@ -113,7 +114,7 @@ contract Croudsale is Ownable, OwnerWithdrawable {
   }
 
   // Function to add payment tokens
-  function addWhiteListedToken(address[] memory _tokens, uint256[] memory _prices) external onlyOwner saleStarted {
+  function addWhiteListedToken(address[] memory _tokens, uint256[] memory _prices) external onlyOwner saleNotStarted {
     require(_tokens.length == _prices.length, "Presale: tokens & prices arrays length mismatch");
 
     for (uint256 i = 0; i < _tokens.length; i++) {
@@ -152,4 +153,5 @@ contract Croudsale is Ownable, OwnerWithdrawable {
       withdrawCurrency(address(this).balance);
     }
   } 
+
 }

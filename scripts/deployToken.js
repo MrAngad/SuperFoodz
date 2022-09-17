@@ -7,7 +7,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  const Token = await hre.ethers.getContractFactory("SFToken");
+  const Token = await hre.ethers.getContractFactory("Token");
   const token = await Token.deploy("SuperFoodz", "SF", 300000000, 3141592654);
 
   await token.deployed();
