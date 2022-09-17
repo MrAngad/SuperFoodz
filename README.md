@@ -1,4 +1,6 @@
 # SuperFoodz
 
 ## ERC20 Token
-* Contract is called SFToken.sol
+* Vesting token Contract is called VestingToken.sol
+* ICO is Croudsale.sol
+

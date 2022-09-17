@@ -91,9 +91,7 @@ contract Croudsale is Ownable, OwnerWithdrawable {
     // Update Stats
     totalTokensSold = totalTokensSold.add(saleTokenAmt);
     buyersAmount[msg.sender] = buyersAmount[msg.sender].add(saleTokenAmt);
-    // bytes memory data = abi.encodeWithSignature("transfer(address,uint256)", msg.sender, saleTokenAmt);
-    // (bool success, bytes memory returnData) = address(saleTokenAddress).call(data);
-    // require(success, string(returnData));
+    IERC20Metadata(saleTokenAddress).safeTransfer(msg.sender, _amount);
   }
 
   // Function to set information of Token sold in Pre-Sale and its rate in Native currency
