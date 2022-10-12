@@ -92,6 +92,8 @@ contract Croudsale is Ownable, OwnerWithdrawable {
     totalTokensSold = totalTokensSold.add(saleTokenAmt);
     buyersAmount[msg.sender] = buyersAmount[msg.sender].add(saleTokenAmt);
     IERC20Metadata(saleTokenAddress).safeTransfer(msg.sender, _amount);
+    emit TokensSold(msg.sender, _amount);
+
   }
 
   // Function to set information of Token sold in Pre-Sale and its rate in Native currency
@@ -148,8 +150,10 @@ contract Croudsale is Ownable, OwnerWithdrawable {
       address token = tokenSupported[i];
       uint256 amt = IERC20(token).balanceOf(address(this));
       withdraw(token, amt);
-      withdrawCurrency(address(this).balance);
     }
+    withdrawCurrency(address(this).balance);
   } 
+
+  event TokensSold(address _address, uint256 _amount);
 
 }
