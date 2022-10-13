@@ -37,8 +37,9 @@ describe("UnitTest original code", function () {
     const paymentToken = await PaymentToken.connect(deployer).deploy("SuperFoodz", "SF", 300000000, 3141592654);
 
     const ICO = await ethers.getContractFactory("Croudsale");
-    const ico = await ICO.connect(deployer).deploy(token.address);
+    const ico = await ICO.connect(deployer).deploy(token.address, "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0");
 
+    console.log(await ico.priceFeed());
     return { ico, token, paymentToken, deployer, otherAccount };
   }
 

@@ -13,8 +13,7 @@ contract Bridge is Ownable, OwnerWithdrawable {
   AggregatorV3Interface internal priceFeed;
 
   bool saleActive;
-  address immutable treasury;
-
+  address treasury;
   modifier ifSaleActive {
     require(saleActive == true , "Sale is not active");
     _;
@@ -22,7 +21,8 @@ contract Bridge is Ownable, OwnerWithdrawable {
 
   constructor(address _priceFeed, address _treasury) {
     treasury = _treasury;
-    priceFeed = AggregatorV3Interface(_priceFeed); // mainnet 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
+    priceFeed = AggregatorV3Interface(_priceFeed);
+    transferOwnership(_treasury);
   }
 
   function tokensReceived() external payable ifSaleActive {
@@ -30,7 +30,6 @@ contract Bridge is Ownable, OwnerWithdrawable {
     (, _price,,,) = priceFeed.latestRoundData();
     payable(treasury).transfer(msg.value);
     emit PurchasedTokens(msg.sender, _price, msg.value); // price - cost of ethereum in busd from pancakeswap
-
   }
 
   function refund(address _receiver) external payable onlyOwner {
@@ -46,6 +45,10 @@ contract Bridge is Ownable, OwnerWithdrawable {
     saleActive = true;
   }
   
+  function setTreasury(address _treasury) external onlyOwner {
+    treasury = _treasury;
+  }
+
   // Withdraw all the balance from the contract
   function withdrawAll() external onlyOwner {
     withdrawCurrency(address(this).balance);

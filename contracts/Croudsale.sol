@@ -7,11 +7,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 import "./OwnerWithdrawable.sol";
 
+import "hardhat/console.sol";
+
 contract Croudsale is Ownable, OwnerWithdrawable {
-  using SafeMath for uint256;
+  using SafeMath  for uint256;
   using SafeERC20 for IERC20Metadata;
 
   address public immutable saleTokenAddress;  // Address of SF Token
@@ -28,12 +31,12 @@ contract Croudsale is Ownable, OwnerWithdrawable {
 
   mapping(address => uint256) public buyersAmount; // Amounts of SF Tokens bought by buyers
   mapping(address => bool) public tokenWL;         // Whitelist of tokens to buy from
-  mapping(address => uint256) public tokenPrices;  // 1 Token price in terms of WL tokens
+  AggregatorV3Interface public immutable priceFeed;
   
   // Modifier to check if the sale has already started
   modifier saleNotStarted(){
     if(preSaleStartTime != 0){
-        require(block.timestamp < preSaleStartTime || block.timestamp > preSaleEndTime, "PreSale: Sale has already started!");
+      require(block.timestamp < preSaleStartTime || block.timestamp > preSaleEndTime, "PreSale: Sale has already started!");
     }
     _;
   }
@@ -45,9 +48,10 @@ contract Croudsale is Ownable, OwnerWithdrawable {
     _;
   }
 
-  constructor(address _token) {
+  constructor(address _token, address _priceFeed) {
     saleTokenAddress  = _token;
     saleTokenDecimals = IERC20Metadata(saleTokenAddress).decimals();
+    priceFeed         = AggregatorV3Interface(_priceFeed);
   }
 
   /*************
@@ -57,14 +61,34 @@ contract Croudsale is Ownable, OwnerWithdrawable {
   // Public view function to calculate amount of sale tokens returned if you buy using "amount" of "token"
   function getTokenAmount(address token, uint256 amount) public view returns (uint256) {
     uint256 amtOut;
+    int256 _price;
+    (, _price,,,) = priceFeed.latestRoundData();
+    console.log("price", uint(_price));
     if(token != address(0)){
       require(tokenWL[token] == true, "Presale: Token not whitelisted");
-      // uint tokenDec = IERC20(token).decimals();
-      uint256 price = tokenPrices[token];
-      amtOut = amount.mul(10**saleTokenDecimals).div(price);
+      uint tokenDec = IERC20Metadata(token).decimals();
+      // uint256 price = tokenPrices[token];
+      amtOut = amount.div(tokenDec).mul(10**saleTokenDecimals).div(rate);
     }
     else{
-      amtOut = amount.mul(10**saleTokenDecimals).div(rate);
+      amtOut = amount.mul(10**saleTokenDecimals).mul(uint(_price)).div(rate);
+    }
+    return amtOut;
+  }
+
+  function getCost(address token, uint256 amount) public view returns (uint256) {
+    uint256 amtOut;
+    int256 _price;
+    (, _price,,,) = priceFeed.latestRoundData();
+
+    if(token != address(0)){
+      require(tokenWL[token] == true, "Presale: Token not whitelisted");
+      uint tokenDec = IERC20Metadata(token).decimals();
+      // uint256 price = tokenPrices[token];
+      amtOut = amount.mul(rate).div(uint(_price)).mul(10**tokenDec);
+    }
+    else{
+      amtOut = amount.mul(rate).div(uint(_price)).mul(10**saleTokenDecimals);
     }
     return amtOut;
   }
@@ -95,6 +119,15 @@ contract Croudsale is Ownable, OwnerWithdrawable {
     emit TokensSold(msg.sender, _amount);
 
   }
+ 
+  function vestBridgePurchase(address _investor, uint256 _saleTokenAmt) external onlyOwner saleDuration {
+    totalTokensSold = totalTokensSold.add(_saleTokenAmt);
+    buyersAmount[_investor] = buyersAmount[_investor].add(_saleTokenAmt);
+
+    IERC20Metadata(saleTokenAddress).safeTransfer(_investor, _saleTokenAmt);
+
+    emit TokensSold(_investor, _saleTokenAmt);
+  }
 
   // Function to set information of Token sold in Pre-Sale and its rate in Native currency
   function setSaleTokenParams(uint256 _totalTokensforSale, uint256 _rate) external onlyOwner saleNotStarted {
@@ -114,29 +147,17 @@ contract Croudsale is Ownable, OwnerWithdrawable {
   }
 
   // Function to add payment tokens
-  function addWhiteListedToken(address[] memory _tokens, uint256[] memory _prices) external onlyOwner saleNotStarted {
-    require(_tokens.length == _prices.length, "Presale: tokens & prices arrays length mismatch");
-
+  function addWhiteListedToken(address[] memory _tokens) external onlyOwner saleNotStarted {
     for (uint256 i = 0; i < _tokens.length; i++) {
-      require(_prices[i] != 0, "Presale: Cannot set price to 0");
-      tokenWL[_tokens[i]]     = true;
-      tokenPrices[_tokens[i]] = _prices[i];
+      tokenWL[_tokens[i]] = true;
     }
   }
 
   // Function to update token rate
-  function updateTokenRate(address[] memory _tokens, uint256[] memory _prices, uint256 _rate) external onlyOwner {
-    require(_tokens.length == _prices.length, "Presale: tokens & prices arrays length mismatch");
-
-    if(_rate != 0) {
-      rate = _rate;
-    }
-
-    for(uint256 i = 0; i < _tokens.length; i++) {
-      require(tokenWL[_tokens[i]] == true, "Presale: Token not whitelisted");
-      require(_prices[i] != 0, "PreSale: Cannot set rate as 0");
-      tokenPrices[_tokens[i]] = _prices[i];
-    }
+  function updateTokenRate(uint256 _rate) external onlyOwner {
+    require(_rate != 0, "Sale price cannot be zero");
+    rate = _rate;
+    emit SalePriceUpdated(rate);
   }
 
   // Stop the Sale 
@@ -155,5 +176,6 @@ contract Croudsale is Ownable, OwnerWithdrawable {
   } 
 
   event TokensSold(address _address, uint256 _amount);
+  event SalePriceUpdated(uint256 _price);
 
 }
