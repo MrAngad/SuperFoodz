@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.9;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -68,7 +68,7 @@ contract Croudsale is Ownable, OwnerWithdrawable {
       require(tokenWL[token] == true, "Presale: Token not whitelisted");
       uint tokenDec = IERC20Metadata(token).decimals();
       // uint256 price = tokenPrices[token];
-      amtOut = amount.div(tokenDec).mul(10**saleTokenDecimals).div(rate);
+      amtOut = amount.div(10**tokenDec).mul(10**saleTokenDecimals).div(rate);
     }
     else{
       amtOut = amount.mul(10**saleTokenDecimals).mul(uint(_price)).div(rate);

@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.9;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./OwnerWithdrawable.sol";
@@ -33,7 +33,7 @@ contract Bridge is Ownable, OwnerWithdrawable {
   }
 
   function refund(address _receiver) external payable onlyOwner {
-    payable(treasury).transfer(msg.value);
+    payable(_receiver).transfer(msg.value);
     emit RefundETH(_receiver, msg.value); // price - cost of ethereum in busd from pancakeswap
   }
 
