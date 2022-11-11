@@ -11,8 +11,6 @@ contract OwnerWithdrawable is Ownable {
 
     receive() external payable {}
 
-    fallback() external payable {}
-
     function withdraw(address token, uint256 amt) public onlyOwner {
       IERC20(token).transfer(msg.sender, amt);
     }

@@ -12,8 +12,18 @@ async function main() {
 
   await token.deployed();
 
+  const Croudsale = await hre.ethers.getContractFactory("Croudsale");
+  const ICO = await Croudsale.deploy(token.address, "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada");
+
+  await ICO.deployed();
+
   console.log(
     `Token deployed to ${token.address}`
+  );
+
+
+  console.log(
+    `ICO deployed to ${ICO.address}`
   );
 }
 

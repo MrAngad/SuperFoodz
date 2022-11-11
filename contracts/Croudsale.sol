@@ -5,7 +5,6 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
@@ -24,10 +23,10 @@ contract Croudsale is Ownable, OwnerWithdrawable {
   uint256 public preSaleEndTime;     // Time when PreSale ends
   uint256 public totalTokensforSale; // Total tokens to be sold in the presale
   uint256 public totalTokensSold;    // Total tokens sold to the public in the ICO
-  uint256 public rate;               // Rate wrt to Native Currency of the chain
+  uint256 public rate;               // Rate of SF token in USD
 
-  address[] public buyers;         // List of Buyers
-  address[] public tokenSupported; // List of tokens supported
+  // address[] public buyers;         // List of Buyers
+  address[] public tokenSupported; // List of tokens supported // initialized through constructor
 
   mapping(address => uint256) public buyersAmount; // Amounts of SF Tokens bought by buyers
   mapping(address => bool) public tokenWL;         // Whitelist of tokens to buy from
@@ -52,6 +51,7 @@ contract Croudsale is Ownable, OwnerWithdrawable {
     saleTokenAddress  = _token;
     saleTokenDecimals = IERC20Metadata(saleTokenAddress).decimals();
     priceFeed         = AggregatorV3Interface(_priceFeed);
+    // transferOwnership(0x97Db3068972D1294F10e5cc57e9D51A9c7CC5891);
   }
 
   /*************
@@ -68,27 +68,10 @@ contract Croudsale is Ownable, OwnerWithdrawable {
       require(tokenWL[token] == true, "Presale: Token not whitelisted");
       uint tokenDec = IERC20Metadata(token).decimals();
       // uint256 price = tokenPrices[token];
-      amtOut = amount.div(tokenDec).mul(10**saleTokenDecimals).div(rate);
+      amtOut = amount.div(10**tokenDec).mul(10**saleTokenDecimals).div(rate).mul(1e6);
     }
     else{
-      amtOut = amount.mul(10**saleTokenDecimals).mul(uint(_price)).div(rate);
-    }
-    return amtOut;
-  }
-
-  function getCost(address token, uint256 amount) public view returns (uint256) {
-    uint256 amtOut;
-    int256 _price;
-    (, _price,,,) = priceFeed.latestRoundData();
-
-    if(token != address(0)){
-      require(tokenWL[token] == true, "Presale: Token not whitelisted");
-      uint tokenDec = IERC20Metadata(token).decimals();
-      // uint256 price = tokenPrices[token];
-      amtOut = amount.mul(rate).div(uint(_price)).mul(10**tokenDec);
-    }
-    else{
-      amtOut = amount.mul(rate).div(uint(_price)).mul(10**saleTokenDecimals);
+      amtOut = amount.mul(10**saleTokenDecimals).mul(uint(_price)).div(rate).mul(1e6);
     }
     return amtOut;
   }

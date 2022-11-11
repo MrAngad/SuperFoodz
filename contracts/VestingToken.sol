@@ -45,6 +45,8 @@ contract Token is ERC20, Pausable, Ownable, ERC20Capped {
 
     event ManualUnfreeze(address _address, uint256 _amount);
 
+    address ADMIN = 0xc1cCE69161Ebf6837f4F07c7d95a4badF30a7d41;
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -54,7 +56,8 @@ contract Token is ERC20, Pausable, Ownable, ERC20Capped {
         ERC20(_name, _symbol)
         ERC20Capped(_maxSupply * 10**18)
     {
-      _mint(msg.sender, _initialSupply*10**18);
+        _mint(ADMIN, _initialSupply*10**18);
+        transferOwnership(ADMIN);
     }
 
     function _mint(address account, uint256 amount) internal virtual override (ERC20, ERC20Capped) {
@@ -438,4 +441,5 @@ contract Token is ERC20, Pausable, Ownable, ERC20Capped {
     function unpause() external onlyOwner {
       _unpause();
     }
+
 }

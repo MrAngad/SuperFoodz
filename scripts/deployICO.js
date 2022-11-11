@@ -8,7 +8,7 @@ const hre = require("hardhat");
 
 async function main() {
   const Croudsale = await hre.ethers.getContractFactory("Croudsale");
-  const ICO = await Croudsale.deploy("0x946cccD20aac54F991b6b96aa91F666Dc4A487E9");
+  const ICO = await Croudsale.deploy("0x0104be7b6091053aD70436B175DE9cB91f7C161F", "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada");
 
   await ICO.deployed();
 
