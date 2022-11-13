@@ -64,15 +64,30 @@ contract Croudsale is Ownable, OwnerWithdrawable {
     int256 _price;
     (, _price,,,) = priceFeed.latestRoundData();
     console.log("price", uint(_price));
+
+    // uint256 usdAmount = amount / uint256(_price);
+    // uint256 amountOout = usdAmount * rate;
+    // return amountOut;
+    // _price = 80000000;
+    console.log("amount = ", amount);
+    console.log("rate = ", rate);
+
     if(token != address(0)){
       require(tokenWL[token] == true, "Presale: Token not whitelisted");
       uint tokenDec = IERC20Metadata(token).decimals();
+      console.log("tokenDec = ", tokenDec);
+
       // uint256 price = tokenPrices[token];
       amtOut = amount.div(10**tokenDec).mul(10**saleTokenDecimals).div(rate).mul(1e6);
     }
     else{
-      amtOut = amount.mul(10**saleTokenDecimals).mul(uint(_price)).div(rate).mul(1e6);
+      amtOut = ((uint256(_price) * amount) / (rate * 10**8) ) *10**6;
+      // = amount.mul(10**saleTokenDecimals).mul(uint(_price)).div(rate).mul(1e6);
     }
+
+    console.log("amtout = ", amtOut);
+
+
     return amtOut;
   }
 

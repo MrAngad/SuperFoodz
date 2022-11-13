@@ -12,6 +12,7 @@ const initialSupply = 300000000;
 const DEPLOYER_WALLET = process.env.ACCOUNT;
 const ZERO_ADDRESS    = "0x0000000000000000000000000000000000000000";
 const DECIMAL_ZEROS   = "000000000000000000";
+const FORMAT   = "1000000000000000000";
 
 describe("UnitTest original code", function () {
   async function deployToken() {
@@ -44,30 +45,44 @@ describe("UnitTest original code", function () {
   }
 
   describe("ICO ", function () {
-    it("SF Token address set correctly", async function () {
-      const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
-      expect(await ico.saleTokenAddress()).to.equal(token.address);
-    });
-    it("SF Token decimals set correctly", async function () {
-      const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
-      expect(await ico.saleTokenDecimals()).to.equal(decimals);
-    });
-    it("setSaleTokenParams", async function () {
-      const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
-      const _totalTokensforSale = 10 + DECIMAL_ZEROS;
-      const _rate = 2 + DECIMAL_ZEROS;
-      await token.approve(ico.address, _totalTokensforSale);
-      await ico.setSaleTokenParams(_totalTokensforSale, _rate);
-      expect(await ico.rate()).to.equal(_rate);
-      expect(await ico.rate()).to.equal(_rate);
+    // it("SF Token address set correctly", async function () {
+    //   const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
+    //   expect(await ico.saleTokenAddress()).to.equal(token.address);
+    // });
+    // it("SF Token decimals set correctly", async function () {
+    //   const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
+    //   expect(await ico.saleTokenDecimals()).to.equal(decimals);
+    // });
+    // it("setSaleTokenParams", async function () {
+    //   const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
+    //   const _totalTokensforSale = 10 + DECIMAL_ZEROS;
+    //   const _rate = 2 + DECIMAL_ZEROS;
+    //   await token.approve(ico.address, _totalTokensforSale);
+    //   await ico.setSaleTokenParams(_totalTokensforSale, _rate);
+    //   expect(await ico.rate()).to.equal(_rate);
+    //   expect(await ico.rate()).to.equal(_rate);
 
-    });
-    it("setSaleTokenParams", async function () {
+    // });
+    // it("setSaleTokenParams", async function () {
+    //   const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
+    //   const _totalTokensforSale = 10 + DECIMAL_ZEROS;
+    //   const _rate = 2 + DECIMAL_ZEROS;
+    //   await token.approve(ico.address, _totalTokensforSale);
+    //   await ico.setSaleTokenParams(_totalTokensforSale, _rate);
+    // });
+    it("Get amt", async function () {
       const { ico, token, paymentToken, deployer, otherAccount } = await loadFixture(deployToken);
       const _totalTokensforSale = 10 + DECIMAL_ZEROS;
-      const _rate = 2 + DECIMAL_ZEROS;
-      await token.approve(ico.address, _totalTokensforSale);
-      await ico.setSaleTokenParams(_totalTokensforSale, _rate);
+      const _rate = 180000;
+      await token.connect(deployer).approve(ico.address, _totalTokensforSale);
+      await ico.connect(deployer).setSaleTokenParams(_totalTokensforSale, _rate);
+
+      let amt = await ico.getTokenAmount(ZERO_ADDRESS, 1+DECIMAL_ZEROS);
+      console.log("Native currency: ",amt/FORMAT);
+      
+      await ico.connect(deployer).addWhiteListedToken(["0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"]);
+      amt = await ico.getTokenAmount("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", 1+"000000");
+      console.log("Native currency: ",amt/FORMAT);
     });
   });
 });

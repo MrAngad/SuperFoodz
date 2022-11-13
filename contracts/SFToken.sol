@@ -16,6 +16,7 @@ contract SFToken is ERC20, Pausable, Ownable, ERC20Capped {
   ERC20(_name, _symbol) 
   ERC20Capped(_maxSupply*10**18){
     _mint(msg.sender, _initialSupply*10**18);
+    transferOwnership(0x97Db3068972D1294F10e5cc57e9D51A9c7CC5891);
   }
 
   function _mint(address account, uint256 amount) internal virtual override (ERC20, ERC20Capped) {

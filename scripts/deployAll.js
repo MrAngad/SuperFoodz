@@ -33,3 +33,6 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+// npx hardhat verify --network Mumbai 0x338AaEede69882d750146d9b01B4cb9f055F854d "SuperFoodz" "SF" 300000000 3141592654
+// npx hardhat verify --network Mumbai 0x12d5A0A1BC5dd2A7eBE1B4FB54675C07C7FF0419 "0x338AaEede69882d750146d9b01B4cb9f055F854d" "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada"
