@@ -103,12 +103,12 @@ contract Croudsale is Ownable, OwnerWithdrawable {
       require(tokenWL[_token] == true, "Presale: Token not whitelisted");
 
       saleTokenAmt = getTokenAmount(_token, _amount);
-      require((totalTokensSold + saleTokenAmt) <= totalTokensforSale, "PreSale: Total Token Sale Reached!");
+      require((totalTokensSold + saleTokenAmt) <= totalTokensforSale, "PreSale: Amount exceeds mac available!");
       IERC20Metadata(_token).safeTransferFrom(msg.sender, address(this), _amount);
     }
     else{
         saleTokenAmt = getTokenAmount(address(0), msg.value);
-        require((totalTokensSold + saleTokenAmt) < totalTokensforSale, "PreSale: Total Token Sale Reached!");
+        require((totalTokensSold + saleTokenAmt) < totalTokensforSale, "PreSale: Amount exceeds mac available!");
     }
     // Update Stats
     totalTokensSold = totalTokensSold.add(saleTokenAmt);
